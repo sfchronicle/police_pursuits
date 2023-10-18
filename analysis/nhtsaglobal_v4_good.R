@@ -93,6 +93,19 @@ pursuits_accidents_joined <- inner_join(accident_17_21, pursuits_accidents_17_21
 #right-join the accident file to the person file so that all the people are connected to their respective accident
 person_accident <- right_join(person_17_21_fatalities, pursuits_accidents_joined, by = "accident_id") 
 
+#join the person-accident df to the race df
+person_accident_race <- left_join(person_accident, race_19_21, by = c("YEAR","ST_CASE", "STATE",
+                                                                      "PER_NO","VEH_NO", "accident_id")) %>%
+  distinct(STATE, ST_CASE, VEH_NO, PER_NO, AGE, RACENAME.x, .keep_all = TRUE) %>%
+  mutate(latino = ifelse(HISPANICNAME == "Non-Hispanic"|HISPANICNAME == "Redacted"|
+                           HISPANICNAME == "Unknown", "", "latino")) %>%
+  relocate(latino, .after = HISPANICNAME) %>%
+  unite(col="race_combined", c(RACENAME.x, RACENAME.y)) %>%
+  mutate(race_combined = gsub("_NA|NA_|\\sor\\sAfrican\\sAmerican","",race_combined)) %>%
+  mutate(race_combined = tolower(race_combined)) %>%
+  mutate(race_combined = gsub("chinese|vietnamese|asian\\sindian|other\\sindian","asian",race_combined)) %>%
+  mutate(race_forATjoin = ifelse(latino != "", paste(race_combined, latino, sep=","), race_combined))
+
 
 racecats <- person_accident_race %>%
   select(race_forATjoin, race_combined, HISPANICNAME)
