@@ -125,7 +125,9 @@ nhtsa_fatalities <- person_accident_race %>%
   mutate(state_abb = state.abb[match(STATENAME.x,state.name)]) %>%
   relocate(state_abb, .before = date) %>%
   mutate(age_nhtsa = as.double(AGE)) %>%
-  mutate(race_source_nhtsa = "nhtsa") %>%
+  mutate(race_source_nhtsa = "nhtsa")
+
+nhtsa_fatalities <- nhtsa_fatalities %>%
   mutate(nhtsa_index = 1:nrow(nhtsa_fatalities), nhtsa_fatalities)
 
 #read in data from airtable
