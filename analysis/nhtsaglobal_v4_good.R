@@ -1,6 +1,13 @@
 library(tidyverse)
 library(fuzzyjoin)
 
+#notes from dan: ADD AT/NHTSA to columns of origin √√√
+#maneuver file interesting
+#do they keep info on weapons in data? good folo question
+#add latitude and longitude to the checks √
+#expand ranges of matches
+#take 20 matches in airtable and not nhtsa and try to find them in nhtsa not as pursuits - do a 'perfect match'
+
 ###read in nhtsa data - extremely annoying because a bunch of the files don't have years attached so we cannot read them in a list
 
 #2021
@@ -96,16 +103,20 @@ person_accident <- right_join(person_17_21_fatalities, pursuits_accidents_joined
 #join the person-accident df to the race df
 person_accident_race <- left_join(person_accident, race_19_21, by = c("YEAR","ST_CASE", "STATE",
                                                                       "PER_NO","VEH_NO", "accident_id")) %>%
-  distinct(STATE, ST_CASE, VEH_NO, PER_NO, AGE, RACENAME.x, .keep_all = TRUE) %>%
+  #figure out why we need to deduplicate?!?!?!?! or if we should?!?!?!
+ distinct(STATE, ST_CASE, VEH_NO, PER_NO, AGE, RACENAME.x, .keep_all = TRUE) %>%
   mutate(latino = ifelse(HISPANICNAME == "Non-Hispanic"|HISPANICNAME == "Redacted"|
                            HISPANICNAME == "Unknown", "", "latino")) %>%
-  relocate(latino, .after = HISPANICNAME) %>%
+  relocate(latino, 
+           .after = HISPANICNAME) %>%
   unite(col="race_combined", c(RACENAME.x, RACENAME.y)) %>%
   mutate(race_combined = gsub("_NA|NA_|\\sor\\sAfrican\\sAmerican","",race_combined)) %>%
   mutate(race_combined = tolower(race_combined)) %>%
   mutate(race_combined = gsub("chinese|vietnamese|asian\\sindian|other\\sindian","asian",race_combined)) %>%
   mutate(race_forATjoin = ifelse(latino != "", paste(race_combined, latino, sep=","), race_combined))
 
+person_grouped <- person_accident_race %>%
+  group_by(YEAR) %>% summarize(count = n())
 
 ###the df which should now roughly be a dataset of pursuit fatalities, but we need to do some cleaning before we join.
 ###rename/relocate/clean columnse, prep for joining
@@ -121,14 +132,15 @@ nhtsa_fatalities <- person_accident_race %>%
   mutate(county = str_trim(county)) %>%
   mutate(state_abb = state.abb[match(STATENAME.x,state.name)]) %>%
   relocate(state_abb, .before = date) %>%
-  mutate(age_nhtsa = as.double(AGE)) %>%
-  mutate(race_source_nhtsa = "nhtsa")
+  mutate(age = as.double(AGE)) %>%
+  mutate(race_source = "nhtsa")
 
 nhtsa_fatalities <- nhtsa_fatalities %>%
-  mutate(nhtsa_index = 1:nrow(nhtsa_fatalities), nhtsa_fatalities)
+  mutate(index = 1:nrow(nhtsa_fatalities), nhtsa_fatalities)
 
 #read in data from airtable
-airtable_fatalities <- read_csv("merged5.csv") %>%
+#airtable_fatalities <- read_csv("merged5.csv") %>%
+airtable_fatalities <- read_csv("merged6_nov20_2023.csv") %>%
   mutate(date = as.Date(date2, format =  "%m/%d/%Y")) %>%
   relocate(date, .after = date2)%>%
   mutate(state_abb = toupper(state)) %>%
@@ -137,77 +149,79 @@ airtable_fatalities <- read_csv("merged5.csv") %>%
   mutate(county = tolower(county)) %>%
   mutate(county = str_replace_all(county,"county|parish|city|[[:punct:]]", "")) %>%
   mutate(county = str_trim(county)) %>%
-  rename(AT_race = race) %>%
-  mutate(age_airtable = as.double(age))
+  mutate(age = as.double(age))
+
 
 #create a subset of NHTSA data just for joining with airtable
 nhtsa_select_global <- nhtsa_fatalities %>%
-  select(accident_id, county, date, state_abb, age_nhtsa, SEXNAME, race_forATjoin, race_source_nhtsa, nhtsa_index, PER_TYPNAME, FATALS.y, YEAR, LATITUDE, LONGITUD, PER_TYP) %>%
+  select(accident_id, county, date, state_abb, age, SEXNAME, race_forATjoin, race_source, index, PER_TYPNAME, FATALS.y, YEAR, LATITUDE, LONGITUD, PER_TYP) %>%
   mutate(SEXNAME = tolower(SEXNAME)) %>%
   rename(gender = SEXNAME) %>%
   mutate(county = str_replace_all(county,"county|parish|city|[[:punct:]]", ""))
 
+colnames(nhtsa_select_global) <- paste("nhtsa",colnames(nhtsa_select_global),sep="_") 
+
 #create a subset of airtable data just for joining with NHTSA
 airtable_fatalities_select <- airtable_fatalities %>%
-  select(date, county, year, Name, age_airtable, gender, AT_race, race_source, person_role, initial_reason, notes, circumstances, state_abb, number_dead, case_id, latitude, longitude, zip, index) %>%
+  select(date, county, year, Name, age, gender, race, race_source, person_role, initial_reason, notes, circumstances, state_abb, number_dead, case_id, latitude, longitude, zip, index) %>%
   filter(year != 2022)
 
+colnames(airtable_fatalities_select) <- paste("at",colnames(airtable_fatalities_select),sep="_") 
+
+
 #join the airtable and the nhtsa datasets together
-joined <- inner_join(airtable_fatalities_select, nhtsa_select_global, by = c("date", "county", "state_abb"), relationship = "many-to-many") 
+joined <- inner_join(airtable_fatalities_select, nhtsa_select_global, by = c("at_date" = "nhtsa_date", "at_county" = "nhtsa_county", "at_state_abb" = "nhtsa_state_abb"), relationship = "many-to-many") 
 
 #relocate columns and rename for easier reading of df
 joined1 <- joined %>%
-  relocate(FATALS.y, .after=number_dead) %>%
-  relocate(age_nhtsa, .after = age_airtable) %>%
-  relocate(gender.y, .after = gender.x) %>%
-  rename(gender_airtable = gender.x, gender_nhtsa = gender.y) %>%
-  relocate(race_forATjoin, .after = AT_race) 
+  relocate(nhtsa_FATALS.y, .after=at_number_dead) %>%
+  relocate(nhtsa_age, .after = at_age) %>%
+  relocate(nhtsa_gender, .after = at_gender) %>%
+  relocate(nhtsa_race_forATjoin, .after = at_race) 
 
 ###create a filter that conditionally filters out duplicates based on their proximity to each other  
 #for duplicates, the closest matches to each other in gender and age stay in
 #for non-dupes, the original match stays in
-ATT_joined1 <- joined1 %>%
-  mutate(gender.x = trimws(gender_airtable , which = c("both"))) %>%
-  mutate(gender.y = trimws(gender_nhtsa, which = c("both"))) %>%
-  group_by(index) %>% mutate(countindex = n()) %>% ungroup %>%
+slice_joined1 <- joined1 %>%
+  mutate(at_gender = trimws(at_gender, which = c("both"))) %>%
+  mutate(nhtsa_gender = trimws(nhtsa_gender, which = c("both"))) %>%
+  group_by(at_index) %>% mutate(countatindex = n()) %>% ungroup %>%
   group_by(nhtsa_index) %>% mutate(countnhtsaindex = n()) %>% ungroup %>%
-  mutate(nhtsa_at_index = paste(nhtsa_index, index, sep = "_")) %>%
-  mutate(quality = case_when((countindex > 1 |countnhtsaindex > 1) & age_airtable == age_nhtsa & gender_airtable == gender_nhtsa ~ 4,
-                             (countindex >1.0 |countnhtsaindex > 1.0) & ((round(age_airtable) <= age_nhtsa+1.0&round(age_airtable)>=age_nhtsa-1.0)|is.na(age_airtable)|age_nhtsa == 998) & gender.x == gender.y ~ 3,
-                             (countindex == 1 | countnhtsaindex == 1) ~ 3,
-                             (countindex >1 |countnhtsaindex > 1) & ((round(age_airtable) <= age_nhtsa+4&round(age_airtable)>=age_nhtsa-4)|is.na(age_airtable) & gender.x == gender.y) ~ 2,
-                             ((age_nhtsa+4&round(age_airtable)>=age_nhtsa-4) & gender_airtable=="unknown"|gender_nhtsa=="unknown"|is.na(gender_airtable)|is.na(gender_nhtsa)) ~ 2,
-                              .default = 1)) %>%
-  relocate(quality, .before = Name) %>%
-  group_by(Name, date) %>%
+  mutate(nhtsa_at_index = paste(nhtsa_index, at_index, sep = "_")) %>%
+  mutate(quality = case_when((countatindex > 1 |countnhtsaindex > 1) & at_age == nhtsa_age & at_gender == nhtsa_gender ~ 4,
+                             (countatindex >1.0 |countnhtsaindex > 1.0) & ((round(at_age) <= nhtsa_age+1.0&round(at_age)>=nhtsa_age-1.0)|is.na(at_age)|nhtsa_age == 998) & at_gender == nhtsa_gender ~ 3,
+                             (countatindex == 1 | countnhtsaindex == 1) ~ 3,
+                             (countatindex >1 |countnhtsaindex > 1) & ((round(at_age) <= nhtsa_age+4&round(at_age)>=nhtsa_age-4)|is.na(at_age) & at_gender == nhtsa_gender) ~ 2,
+                             ((nhtsa_age+4&round(at_age)>=nhtsa_age-4) & at_gender=="unknown"|nhtsa_gender=="unknown"|is.na(at_gender)|is.na(nhtsa_gender)) ~ 2,
+                             .default = 1)) %>%
+  relocate(quality, .before = at_Name) %>%
+  group_by(at_Name, at_date) %>%
   slice(which.max(quality))
- 
+
 
 #find rows that have unique dates + counties but didn't make it through our filtering above bc they are 'name withheld'
-namelessjoined <- anti_join(joined1, ATT_joined1, by = c("date", "county", "Name")) 
+namelessjoined <- anti_join(joined1, slice_joined1, by = c("at_date", "at_county", "at_Name")) 
 
 #dedupe further and add a column for data source for the joined data.
 #set aside for now.
-joineddistinct2 <- ATT_joined1 %>%
-  distinct(Name, index, .keep_all = TRUE) %>%
+joineddistinct2 <- slice_joined1 %>%
+  distinct(at_Name, nhtsa_at_index, .keep_all = TRUE) %>%
   mutate(data_source = "nhtsa_airtable")
 
 #an aside - there are a few cases where nhtsa's death counts differ from ours in airtable. 
 #important to look at those later.
 differing_death_counts <- joineddistinct2 %>%
-  filter(number_dead != FATALS.y)
+  filter(at_number_dead != nhtsa_FATALS.y)
 
 #ok onto the next - finding a) fuzzy matches/possible matches
 #b) cases that appear only in airtable or only in nhtsa
 #first we anti-join the airtable data to find possible deaths missing from NHTSA - the first iteration of our 'undercount' figure
-nonjoined_airtable <- anti_join(airtable_fatalities_select, nhtsa_select_global,by = c("date", "county", "state_abb")) %>%
-  rename(gender_airtable = gender)
+nonjoined_airtable <- anti_join(airtable_fatalities_select, nhtsa_select_global,by = c("at_date"="nhtsa_date", "at_county"="nhtsa_county", "at_state_abb"="nhtsa_state_abb")) 
 
 #anti-join to find possible deaths missing from airtable
-nonjoined_nhtsa <- anti_join(nhtsa_select_global, airtable_fatalities_select,by = c("date", "county", "state_abb")) %>%
-  rename(gender_nhtsa = gender)
+nonjoined_nhtsa <- anti_join(nhtsa_select_global, airtable_fatalities_select,by = c("nhtsa_date" = "at_date", "nhtsa_county" = "at_county", "nhtsa_state_abb" = "at_state_abb")) 
 
-#Before we get an undercount figure we have ID and name all 'fuzzy matches.'
+#Before we get an undercount figure we have to ID and name all 'fuzzy matches.'
 #our undercount figure will be conservative, meaning if the match appears to be close, we will consider it a match.
 #We will run the airtable data against the nhtsa data, testing each row to see if it matches: 
 #a) date and state, and b) county, state and date +- 3 days
@@ -216,12 +230,14 @@ nonjoined_nhtsa <- anti_join(nhtsa_select_global, airtable_fatalities_select,by 
 
 # Add date ranges to both data frames
 nonjoined_airtable <- nonjoined_airtable %>%
-  mutate(start_date = as.numeric(date - 3),
-         end_date = as.numeric(date + 3))
+  mutate(start_date = as.numeric(at_date - 7),
+         end_date = as.numeric(at_date + 7)) %>%
+  filter(!is.na(start_date) & !is.na(end_date))
 
 nonjoined_nhtsa <- nonjoined_nhtsa %>%
-  mutate(start_date = as.numeric(date - 3),
-         end_date = as.numeric(date + 3))
+  mutate(start_date = as.numeric(nhtsa_date - 7),
+         end_date = as.numeric(nhtsa_date + 7)) %>%
+  filter(!is.na(start_date) & !is.na(end_date))
 
 #I did this via a genome join, which checks both for one exact match (county) and then a rough match within a small range
 #This one was within 3 days on either side. When I did my manual review, the vast majority of possible matches looked between 1-2
@@ -231,51 +247,52 @@ nonjoined_nhtsa <- nonjoined_nhtsa %>%
 #and i will dedupe on name as well, ending up only with unique matches that have lots of other matching or similar variables.
 
 possible_datefuzzies <- genome_inner_join(nonjoined_nhtsa, nonjoined_airtable,
-                                          by = c("county" = "county", "start_date", "end_date")) 
+                                          by = c("nhtsa_county" = "at_county", "start_date", "end_date")) 
 
 possible_datefuzziesorg <- possible_datefuzzies %>%
-  relocate(state_abb.y, .after = state_abb.x) %>%
-  relocate(FATALS.y, .after=number_dead) %>%
-  relocate(age_airtable, .before = YEAR) %>%
-  relocate(age_nhtsa, .after = age_airtable) %>%
-  mutate(date = date.y) %>%
-  relocate(gender_nhtsa, .after = gender_airtable) %>%
-  relocate(race_forATjoin, .after = AT_race) %>%
-  relocate(PER_TYPNAME, .after = person_role) %>%
-  mutate(agediff = age_airtable - age_nhtsa, datediff = date.y - date.x, gendermatch = ifelse(gender_airtable == gender_nhtsa, "1", "0")) %>%
-  relocate(datediff, .after = date.y) %>%
-  relocate(agediff, .after = age_nhtsa) %>%
-  relocate(county.y, .after = county.x) %>%
-  relocate(gendermatch, .after = gender_nhtsa) %>%
-  filter(state_abb.x == state_abb.y, gendermatch != 0, (agediff <= 4 & agediff >= -3)) %>%
-  distinct(Name, date.x, county.x, .keep_all = TRUE) %>%
-  rename(county = county.y)
+  relocate(at_state_abb, .after = nhtsa_state_abb) %>%
+  relocate(nhtsa_FATALS.y, .after=at_number_dead) %>%
+  relocate(at_age, .before = nhtsa_YEAR) %>%
+  relocate(nhtsa_age, .after = at_age) %>%
+  mutate(date = at_date) %>%
+  relocate(nhtsa_gender, .after = at_gender) %>%
+  relocate(nhtsa_race_forATjoin, .after = at_race) %>%
+  relocate(nhtsa_PER_TYPNAME, .after = at_person_role) %>%
+  mutate(agediff = at_age - nhtsa_age, datediff = at_date - nhtsa_date, gendermatch = ifelse(at_gender == nhtsa_gender, "1", "0")) %>%
+  relocate(datediff, .after = at_date) %>%
+  relocate(agediff, .after = nhtsa_age) %>%
+  relocate(nhtsa_county, .after = at_county) %>%
+  relocate(gendermatch, .after = nhtsa_gender) %>%
+  filter(nhtsa_state_abb == at_state_abb, gendermatch != 0, (abs(agediff) <= 7)) %>%
+  distinct(at_Name, nhtsa_date, at_county, .keep_all = TRUE) 
+#%>%
+ # rename(county = nhtsa_county)
 
 possible_datefuzziesorg_grouped <- possible_datefuzziesorg  %>%
-  group_by(year) %>%
+  group_by(at_year) %>%
   summarize(count = n())
 
 ### now we will join the nonjoined data by date and state to see if there are matches where we labeled counties differently
-datestate <- inner_join(nonjoined_airtable, nonjoined_nhtsa, by = c("date", "state_abb"), relationship = "many-to-many") 
+datestate <- inner_join(nonjoined_airtable, nonjoined_nhtsa, by = c("at_date"="nhtsa_date", "at_state_abb"="nhtsa_state_abb"), relationship = "many-to-many") 
 
 ##compare and relocate a bunch of the columns to test whether each matches
 ##this list feels pretty comprehensively like a list of actual matches!
 possiblefuzzies_datestate <- datestate %>%
-  relocate(age_airtable, .before = YEAR) %>%
-  relocate(age_nhtsa, .after = age_airtable) %>%
-  relocate(gender_nhtsa, .after = gender_airtable) %>%
-  relocate(race_forATjoin, .after = AT_race) %>%
-  relocate(PER_TYPNAME, .after = person_role) %>%
-  mutate(agediff = age_airtable - age_nhtsa) %>%
-  relocate(county.y, .after = county.x) %>%
-  mutate(gendermatch = ifelse(gender_airtable == gender_nhtsa, "1", "0")) %>%
-  relocate(gendermatch, .after = gender_nhtsa) %>%
+  relocate(at_age, .before = nhtsa_YEAR) %>%
+  relocate(nhtsa_age, .after = at_age) %>%
+  relocate(nhtsa_gender, .after = at_gender) %>%
+  relocate(nhtsa_race_forATjoin, .after = at_race) %>%
+  relocate(nhtsa_PER_TYPNAME, .after = at_person_role) %>%
+  mutate(agediff = at_age - nhtsa_age) %>%
+  relocate(nhtsa_county, .after = at_county) %>%
+  mutate(gendermatch = ifelse(at_gender == nhtsa_gender, "1", "0")) %>%
+  relocate(gendermatch, .after = nhtsa_gender) %>%
   #filtering the fuzzy matches to cases where gender matches and the age difference is within three years on either side
-  filter(gendermatch != 0, (agediff <= 3 & agediff >= -3)) %>%
-  distinct(Name, date, county.x, .keep_all = TRUE) %>%
+  filter(gendermatch != 0, abs(agediff) <= 4) %>%
+  distinct(at_Name, at_date, at_county, .keep_all = TRUE) %>%
   #kept both counties, but am using NHTSA's county as the default
-  rename(county = county.y) %>%
-  mutate(latdiff = LATITUDE-latitude)
+ # rename(county = nhtsa_county) %>%
+  mutate(latdiff = nhtsa_LATITUDE-at_latitude)
 
 #####create dataframe with fuzzies added to joineddistinct
 
@@ -288,12 +305,12 @@ joineddistinct2_plusfuzzies <- bind_rows(joineddistinct2, fuzzies)
 
 #create a true dataframe of airtable rows not in nhtsa by taking our earlier nonjoined_airtable df 
 #and anti-joining it with the fuzzies:
-nonjoined_airtable2 <- anti_join(nonjoined_airtable, fuzzies, by = c("Name", "index")) %>%
+nonjoined_airtable2 <- anti_join(nonjoined_airtable, fuzzies, by = c("at_Name", "at_index")) %>%
   mutate(data_source = "airtable")
 
 #create a true dataframe of nhtsa rows not in airtable by taking our earlier nonjoined_nhtsa df 
 #and anti-joining it with the fuzzies:
-nonjoined_nhtsa2 <- anti_join(nonjoined_nhtsa, fuzzies, by = c("accident_id", "start_date" = "start_date.x", "age_nhtsa", "LATITUDE", "LONGITUD", "PER_TYP")) %>%
+nonjoined_nhtsa2 <- anti_join(nonjoined_nhtsa, fuzzies, by = c("nhtsa_accident_id", "start_date" = "start_date.x", "nhtsa_age", "nhtsa_LATITUDE", "nhtsa_LONGITUD", "nhtsa_PER_TYP")) %>%
   mutate(data_source = "nhtsa") %>%
   distinct()
 
@@ -303,50 +320,53 @@ namelessjoined <- namelessjoined %>%
 
 #the mega-join...bind the rows of fuzzy-joined data, well-joined ata and nonjoined airtable and nhtsa data plus those few errant rows
 #of nameless joins that slipped through the cracks.
-allpursuitdeaths_final <- bind_rows(list(joineddistinct2_plusfuzzies, nonjoined_airtable2, nonjoined_nhtsa2, namelessjoined)) %>%
-  relocate(race_source_nhtsa, .after = race_source) %>%
-  mutate(year_joined = ifelse(!is.na(year), year, YEAR)) %>%
-  mutate(racesource_combined = ifelse(race_source=="nhtsa", "nhtsa",
-                                      ifelse(data_source == "airtable", race_source,
-                                             paste(race_source, race_source_nhtsa, sep=",")))) %>%
-  relocate(racesource_combined, .after = race_source_nhtsa) %>%
-  relocate(year_joined, .before = year) %>%
-  mutate(number_dead_joined = ifelse(!is.na(FATALS.y), FATALS.y, number_dead)) %>%
-  mutate(number_dead_joined = pmax(FATALS.y, number_dead)) %>%
+v1_allpursuitdeaths <- bind_rows(list(joineddistinct2_plusfuzzies, nonjoined_airtable2, nonjoined_nhtsa2, namelessjoined)) %>%
+  relocate(nhtsa_race_source, .after = at_race_source) %>%
+  mutate(year_joined = ifelse(!is.na(nhtsa_YEAR), nhtsa_YEAR, at_year)) %>%
+  mutate(date_joined = ifelse(!is.na(nhtsa_date), nhtsa_date, at_date)) %>%
+  mutate(county_joined = ifelse(!is.na(nhtsa_county), nhtsa_county, at_county)) %>%
+  mutate(state_joined = ifelse(!is.na(nhtsa_state_abb), nhtsa_state_abb, at_state_abb)) %>%
+  mutate(racesource_combined = ifelse(nhtsa_race_source=="nhtsa", "nhtsa",
+                                      ifelse(data_source == "airtable", at_race_source,
+                                             paste(at_race_source, nhtsa_race_source, sep=",")))) %>%
+  relocate(racesource_combined, .after = nhtsa_race_source) %>%
+  relocate(year_joined, .before = at_year) %>%
+  mutate(number_dead_joined = ifelse(!is.na(nhtsa_FATALS.y), nhtsa_FATALS.y, at_number_dead)) %>%
+  mutate(number_dead_joined = pmax(nhtsa_FATALS.y, at_number_dead)) %>%
   relocate(number_dead_joined, .after = year_joined) %>%
-  mutate(race_joined = ifelse(!is.na(race_forATjoin) & race_forATjoin != "unknown|Unknown", race_forATjoin, 
-                              ifelse(AT_race != "unknown|Unknown" & !is.na(AT_race), AT_race, "unknown"))) %>%
-  relocate(race_joined, .before = AT_race) %>%
-  relocate(data_source, .before = date) 
+  mutate(race_joined = ifelse(!is.na(nhtsa_race_forATjoin) & nhtsa_race_forATjoin != "unknown|Unknown", nhtsa_race_forATjoin, 
+                              ifelse(at_race != "unknown|Unknown" & !is.na(at_race), at_race, "unknown"))) %>%
+  relocate(race_joined, .before = at_race) %>%
+  relocate(data_source, .before = at_date) 
 
 #check pursuits by year and state to make sure they roughly match up with priors
-countyandstate <- allpursuitdeaths_final %>%
-  group_by(state_abb) %>% mutate(count_state = n()) %>%
+countyandstate <- v1_allpursuitdeaths %>%
+  group_by(state_joined) %>% mutate(count_state = n()) %>%
   ungroup %>%
-  group_by(county, state_abb, count_state) %>% summarize(count_county = n()) 
+  group_by(county_joined, state_joined, count_state) %>% summarize(count_county = n()) 
 
-yearly <- allpursuitdeaths_final %>%
-  mutate(year = ifelse(!is.na(year), year, YEAR)) %>%
+yearly <- v1_allpursuitdeaths %>%
+  mutate(year = ifelse(!is.na(nhtsa_YEAR), nhtsa_YEAR, at_year)) %>%
   group_by(year) %>% summarize(count = n()) 
 
 #anything missing? answer:not from a numeric standpoint...nhtsa's missing stuff appear to be mostly filtered-out dupes 
 #(which we can use to manually replace the less good matches later)
-anything_missing_nhtsa <- anti_join(nhtsa_select_global, allpursuitdeaths_final, by = "nhtsa_index")
+anything_missing_nhtsa <- anti_join(nhtsa_select_global, v1_allpursuitdeaths, by = "nhtsa_index")
 
 #check if missing in airtable - 2 rows missing - add back in
-anything_missing_airtable <- anti_join(airtable_fatalities_select, allpursuitdeaths_final, by = "index") %>%
+anything_missing_airtable <- anti_join(airtable_fatalities_select, v1_allpursuitdeaths, by = "at_index") %>%
   mutate(data_source = "airtable")
 
-allpursuitdeaths_final2 <- bind_rows(allpursuitdeaths_final, anything_missing_airtable) 
+v2_allpursuitdeaths <- bind_rows(v1_allpursuitdeaths, anything_missing_airtable) 
 
 #now we are at one too many airtable rows. so we will split the data into airtable and nhtsa and dedupe on at index...
 
 #just airtable (has an index that isn't NA)
-allpursuitdeaths_finalat <- allpursuitdeaths_final2 %>% filter(!is.na(index)) %>%
-  distinct(index, .keep_all = TRUE)
+at_allpursuitdeaths_final <- v2_allpursuitdeaths %>% filter(!is.na(at_index)) %>%
+  distinct(at_index, .keep_all = TRUE)
 
 #just nhtsa (has an NA index value)
-allpursuitdeaths_finalnoat <- allpursuitdeaths_final %>% filter(is.na(index)) 
+noat_allpursuitdeaths_final <- v2_allpursuitdeaths %>% filter(is.na(at_index)) 
 
 #combined - the final join
 #there are a perfect number of airtable rows with no dupes so we have everything in airtable
@@ -354,13 +374,24 @@ allpursuitdeaths_finalnoat <- allpursuitdeaths_final %>% filter(is.na(index))
 #i will happily take an error rate of 0.4% in my script (notwithstanding some of the other rows that may have matched erroneously
 #or to the wrong row because the joining info is identical across two or more rows.) 
 #Plus we will go through all of those and fix them manually. won't be exhaustive
-allpursuitdeaths_final3 <- bind_rows(allpursuitdeaths_finalat, allpursuitdeaths_finalnoat) %>%
-  arrange(date, county)
+v3_allpursuitdeaths <- bind_rows(at_allpursuitdeaths_final, noat_allpursuitdeaths_final) %>%
+  arrange(date_joined, county_joined)
 
-grouped <- allpursuitdeaths_final3 %>%
+grouped <- v3_allpursuitdeaths %>%
   group_by(year_joined, data_source) %>% summarize(count = n())
 
-#we are close but still need to do a manual review and locate the additional six nhtsa rows!
+#we are close but still need to do a manual review and locate the additional 10 nhtsa rows!
 
-write.csv(allpursuitdeaths_final3, "allpursuitdeaths_final1002v2.csv", na="")
+nhtsa_superfluous_rows <- v3_allpursuitdeaths %>%
+  filter(data_source == "nhtsa") %>%
+  arrange(nhtsa_index, nhtsa_date) %>%
+  group_by(nhtsa_accident_id) %>% mutate(count_nhtsa_acc_id = n()) %>% ungroup() %>%
+  filter(count_nhtsa_acc_id != nhtsa_FATALS.y)
 
+
+v4_allpursuitdeaths <- anti_join(v3_allpursuitdeaths, nhtsa_superfluous_rows)
+
+
+#now we are done
+
+write.csv(v4_allpursuitdeaths, "allpursuitdeaths_final1120v2.csv", na="")
