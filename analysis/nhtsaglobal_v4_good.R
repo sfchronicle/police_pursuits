@@ -456,4 +456,9 @@ write.csv(v4_allpursuitdeaths, "allpursuitdeaths_final1208v1.csv", na="")
 write.csv(race_breakdown, "race_breakdown128.csv")
 
 
+susieview0130 <- read_csv("susieview_0130.csv") %>%
+  filter(data_source != "airtable")
 
+missingnhtsa <- anti_join(nhtsa_select_global, susieview0130, by = c("nhtsa_accident_id", "nhtsa_PER_TYP", "nhtsa_date"))
+
+                          
