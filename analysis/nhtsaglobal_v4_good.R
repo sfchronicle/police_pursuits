@@ -461,4 +461,9 @@ susieview0130 <- read_csv("susieview_0130.csv") %>%
 
 missingnhtsa <- anti_join(nhtsa_select_global, susieview0130, by = c("nhtsa_accident_id", "nhtsa_PER_TYP", "nhtsa_date"))
 
-                          
+
+ 
+
+airtabledeaths <- read_csv("susieview_0130.csv") %>%
+  filter(data_source != "airtable", year_joined != 2022)
+                         
