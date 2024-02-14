@@ -71,4 +71,9 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 <h3> Acknowledgments </h3>
 
-This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the creator of Fatal Encounters. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. We would also like to thank, in no particular order, Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Washington Post's Fatal Force team, Geoffrey Alpert,
+This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the creator of Fatal Encounters. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
+
+We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John Gross, Sylvia Germek, Abdul Nasser Rad, Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Alexis Piquero, and others.
+
+
+
