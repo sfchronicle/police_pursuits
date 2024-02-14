@@ -7,7 +7,7 @@ The fields have the following definitions:
 | Column name  | Data type | Description |
 | ------------- | ------------- | ------------ |
 | `unique_id`  | integer  | unique number for each person in data.             |
-| `data_source`  | single-select. options: `nhtsa`, `airtable`, `nhtsa_airtable`, `nhtsa_airtable_fuzzy    | source of person and fatality information.              |
+| `data_source`  | single-select. options: `nhtsa`, `airtable`, `nhtsa_airtable`, `nhtsa_airtable_fuzzy`    | source of person and fatality information.              |
 | `year_joined`  | integer  | the year the pursuit occurred.             |
 | `date_joined`  | date  | the date the pursuit occurred; if pursuit takes place over multiple days, date of crash or end of pursuit.            |
 | `number_dead_joined`  | integer  | number of people killed in the pursuit.             |
