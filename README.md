@@ -19,15 +19,15 @@ The fields have the following definitions:
 | `gender_joined`  | single select. options: `male`, `female`, `nonbinary`, `unknown`  |  gender of person killed.             |
 | `race_joined`  | multiple select. options: `black`, `white`, `latino`, `asian`, `other`, `unknown`.  | perceived race and/or ethnicity of the person killed.           |
 | `racesource_combined`  | multiple select. options: `news reports`, `nhtsa`, `photo`, `original data`,  `other`  |source of perceived race and ethnicity information.             |
-| `county_joined`  | string.  | county where fatality or fatal crash occurred.             |
+| `county_joined`  | string  | county where fatality or fatal crash occurred.             |
 | `state_joined`  | single select. options: 50 states plus D.C.  | state where fatality or fatal crash occurred.             |
 | `lat_joined`  | float  | approximate latitude of fatality or fatal crash.             |
 | `long_joined`  | float  | approximate longitude of fatality or fatal crash.             |
 | `at_name`  | string  | name of person killed.             |
 | `at_initial_reason`  | single-select. options: `traffic stop`, `suspected nonviolent`, `suspected violent`, `domestic incident`, `minor/no crime`, `other`, `unknown`  | the alleged incident that touched off officers' pursuit. even if a different crime is later confirmed (such as stolen vehicle) or it's confirmed that no crime has actually occurred, this column specifies the incident that touched off the chase according to news reports and other sources.             |
 | `at_person_role`  | single select. options: `driver`, `passenger`, `bystander`, `officer`, `unclear`, `other`  | the role of the person killed as described in news reports and other records. Driver refers to the driver of the car being pursued; passenger refers to a passenger in the car being pursued. Bystander refers to a person (on foot or in another car) that was killed but not being pursued.           |
-| `at_main_agency_responsible`  | string.  | the main agency responsible for the pursuit if in airtable, as described in news reports. if multiple agencies gave chase, defaults to the agency chasing closest to the fatality or fatal crash.             |
-| `at_news_urls`  | urls | one or more links to a relevant story about the pursuit.             |
+| `at_main_agency_responsible`  | string  | the main agency responsible for the pursuit if in airtable, as described in news reports. if multiple agencies gave chase, defaults to the agency chasing closest to the fatality or fatal crash.             |
+| `at_news_urls`  | url(s) | one or more links to a relevant story about the pursuit.             |
 | `at_city`  | string  | city of crash if included in our detailed dataset.             |
 | `at_zip`  | string  | ZIP code where fatality or fatal crash occurred if included in our detailed dataset. note: ZIP code is in a string format to avoid the deletion of leading zeroes.              |
 | `centroid_geo`  | binary  |  if 1, indicates the coordinates of this crash are a) the centroid of the zip code where it occurred and not exact coordinates. If 0, indicates coordinates of this crash were entered by researchers and should be accurate to approximate location of crash.              |
@@ -73,7 +73,4 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the creator of Fatal Encounters. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
 
-We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John Gross, Sylvia Germek, Abdul Nasser Rad, Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Alexis Piquero, and others.
-
-
-
+We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Alexis Piquero, and others.
