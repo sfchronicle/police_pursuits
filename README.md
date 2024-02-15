@@ -1,8 +1,8 @@
 # Fatal police pursuits database
 
-In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** a yearlong investigation into police car chases across the country. Central to the investigation was a dataset of people killed in pursuits from 2017 through 2022, which we built using three primary sources: the federal government, private research organizations and our own reporting.
+In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** an investigation into police car chases across the U.S. Central to the investigation was a dataset reporters built of people killed in pursuits from 2017 through 2022.
 
-This repository houses the public-facing version of our data, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to explore. 
+This repository houses our public-facing dataset, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to download and explore.
 
 <h3> Data Dictionary </h3>
 
@@ -19,19 +19,19 @@ The fields have the following definitions:
 | `gender_joined`  | single select. options: `male`, `female`, `nonbinary`, `unknown`  |  gender of person killed.             |
 | `race_joined`  | multiple select. options: `black`, `white`, `latino`, `asian`, `other`, `unknown`.  | perceived race and/or ethnicity of the person killed.           |
 | `racesource_combined`  | multiple select. options: `news reports`, `nhtsa`, `photo`, `original data`,  `other`  |source of perceived race and ethnicity information.             |
-| `county_joined`  | string.  | county where fatality or fatal crash occurred.             |
+| `county_joined`  | string  | county where fatality or fatal crash occurred.             |
 | `state_joined`  | single select. options: 50 states plus D.C.  | state where fatality or fatal crash occurred.             |
 | `lat_joined`  | float  | approximate latitude of fatality or fatal crash.             |
 | `long_joined`  | float  | approximate longitude of fatality or fatal crash.             |
 | `at_name`  | string  | name of person killed.             |
 | `at_initial_reason`  | single-select. options: `traffic stop`, `suspected nonviolent`, `suspected violent`, `domestic incident`, `minor/no crime`, `other`, `unknown`  | the alleged incident that touched off officers' pursuit. even if a different crime is later confirmed (such as stolen vehicle) or it's confirmed that no crime has actually occurred, this column specifies the incident that touched off the chase according to news reports and other sources.             |
 | `at_person_role`  | single select. options: `driver`, `passenger`, `bystander`, `officer`, `unclear`, `other`  | the role of the person killed as described in news reports and other records. Driver refers to the driver of the car being pursued; passenger refers to a passenger in the car being pursued. Bystander refers to a person (on foot or in another car) that was killed but not being pursued.           |
-| `at_main_agency_responsible`  | string.  | the main agency responsible for the pursuit if in airtable, as described in news reports. if multiple agencies gave chase, defaults to the agency chasing closest to the fatality or fatal crash.             |
-| `at_news_urls`  | urls | one or more links to a relevant story about the pursuit.             |
+| `at_main_agency_responsible`  | string  | the main agency responsible for the pursuit if in airtable, as described in news reports. if multiple agencies gave chase, defaults to the agency chasing closest to the fatality or fatal crash.             |
+| `at_news_urls`  | url(s) | one or more links to a relevant story about the pursuit.             |
 | `at_city`  | string  | city of crash if included in our detailed dataset.             |
 | `at_zip`  | string  | ZIP code where fatality or fatal crash occurred if included in our detailed dataset. note: ZIP code is in a string format to avoid the deletion of leading zeroes.              |
 | `centroid_geo`  | binary  |  if 1, indicates the coordinates of this crash are a) the centroid of the zip code where it occurred and not exact coordinates. If 0, indicates coordinates of this crash were entered by researchers and should be accurate to approximate location of crash.              |
-| `in_nhtsa`  | binary  | if 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit data.             |
+| `in_fars_pursuit`  | binary  | if 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit data.             |
 
 
 <h3> Methodology </h3>
@@ -48,13 +48,13 @@ The Chronicle followed the <a href="https://portal.cops.usdoj.gov/resourcecenter
 
 The next step was to create one dataset, while avoiding the duplication of cases.
 
-We merged the FARS data with the information from the research groups and our own reporting — comparing them not once but multiple times, using different combinations of date, county and state variables. When a person in FARS matched multiple people in the non-FARS data, we assigned a quality index to each match based on the demographic similarities between the two people (close in age, same gender, etc.), and filtered for the top-quality match in each case.
+We merged the FARS data with the information from the research groups and our own reporting — comparing them multiple times using different combinations of date, county and state variables. When a person in FARS matched multiple people in the non-FARS data, we assigned a quality index to each match based on the demographic similarities between the two people (close in age, same gender, etc.), and filtered for the top-quality match in each case.
 
-In dozens of cases, the best-quality (or only) match was imperfect; FARS data listed a death as occurring in a bordering county, for example, or on a date that was up to seven days before or after a similar death record in our data. Most of these cases listed the same number of people killed with consistent genders and the same or similar ages. Given this, and the relative unlikelihood of multiple fatal pursuits occurring within several days of each other in all but the most populous areas, we concluded most of them were likely actual matches and the inconsistencies were due to minor issues with data entry by FARS analysts, researchers or ourselves.
+In dozens of cases, the best-quality (or only) match was imperfect; FARS data listed a death as occurring in a bordering county, for example, or on a date that was up to seven days before or after a similar death record in our data. Most of these cases listed the same number of people killed with consistent genders and the same or similar ages. Given this, and the relative unlikelihood of multiple fatal pursuits occurring within several days of each other in all but the most populous areas, we concluded most of them were likely actual matches and the inconsistencies were due to minor issues with data entry by government analysts, researchers or ourselves.
 
 Still, we manually reviewed each imperfect match and identified several that we could not confirm were the same pursuit or person. In these cases we considered them separate pursuits.
 
-To calculate the minimum undercount of pursuit-related fatalities by NHTSA, we produced a list of deaths from 2017 through 2021 that were included in the data from research groups and our reporting but missing from FARS. As of late February, when this project was published, FARS data for 2022 was not publicly available. We manually reviewed news reports associated with each case to determine the most likely reason the death was excluded from FARS’ pursuit-involved death data. 
+To calculate the minimum undercount of pursuit-related fatalities by NHTSA, we produced a list of deaths from 2017 through 2021 that were included in the data from research groups and our reporting but missing from FARS' count of pursuit-involved fatalities. As of late February, when this project was published, FARS data for 2022 was not publicly available. We manually reviewed news reports associated with each case to determine the most likely reason the death was excluded from FARS’ pursuit-involved death data. 
 
 To understand why police initiated pursuits that ended with fatalities and who died, we relied on the subset of our pursuit fatalities data — roughly two-thirds of the total — that included additional details about the causes and circumstances of each chase and the people involved, gathered from Mapping Police Violence, Fatal Encounters and Incarcernation, plus news reports and public records.
 
@@ -71,4 +71,6 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 <h3> Acknowledgments </h3>
 
-This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the creator of Fatal Encounters. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. We would also like to thank, in no particular order, Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Washington Post's Fatal Force team, Geoffrey Alpert,
+This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
+
+We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
