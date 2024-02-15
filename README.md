@@ -1,8 +1,8 @@
 # Fatal police pursuits database
 
-In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** a yearlong investigation into police car chases across the country. Central to the investigation was a dataset reporters built of people killed in pursuits from 2017 through 2022.
+In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** an investigation into police car chases across the U.S. Central to the investigation was a dataset reporters built of people killed in pursuits from 2017 through 2022.
 
-This repository houses the public-facing version of our data, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to download and explore.
+This repository houses our public-facing dataset, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to download and explore.
 
 <h3> Data Dictionary </h3>
 
@@ -48,13 +48,13 @@ The Chronicle followed the <a href="https://portal.cops.usdoj.gov/resourcecenter
 
 The next step was to create one dataset, while avoiding the duplication of cases.
 
-We merged the FARS data with the information from the research groups and our own reporting — comparing them not once but multiple times, using different combinations of date, county and state variables. When a person in FARS matched multiple people in the non-FARS data, we assigned a quality index to each match based on the demographic similarities between the two people (close in age, same gender, etc.), and filtered for the top-quality match in each case.
+We merged the FARS data with the information from the research groups and our own reporting — comparing them multiple times using different combinations of date, county and state variables. When a person in FARS matched multiple people in the non-FARS data, we assigned a quality index to each match based on the demographic similarities between the two people (close in age, same gender, etc.), and filtered for the top-quality match in each case.
 
-In dozens of cases, the best-quality (or only) match was imperfect; FARS data listed a death as occurring in a bordering county, for example, or on a date that was up to seven days before or after a similar death record in our data. Most of these cases listed the same number of people killed with consistent genders and the same or similar ages. Given this, and the relative unlikelihood of multiple fatal pursuits occurring within several days of each other in all but the most populous areas, we concluded most of them were likely actual matches and the inconsistencies were due to minor issues with data entry by FARS analysts, researchers or ourselves.
+In dozens of cases, the best-quality (or only) match was imperfect; FARS data listed a death as occurring in a bordering county, for example, or on a date that was up to seven days before or after a similar death record in our data. Most of these cases listed the same number of people killed with consistent genders and the same or similar ages. Given this, and the relative unlikelihood of multiple fatal pursuits occurring within several days of each other in all but the most populous areas, we concluded most of them were likely actual matches and the inconsistencies were due to minor issues with data entry by government analysts, researchers or ourselves.
 
 Still, we manually reviewed each imperfect match and identified several that we could not confirm were the same pursuit or person. In these cases we considered them separate pursuits.
 
-To calculate the minimum undercount of pursuit-related fatalities by NHTSA, we produced a list of deaths from 2017 through 2021 that were included in the data from research groups and our reporting but missing from FARS. As of late February, when this project was published, FARS data for 2022 was not publicly available. We manually reviewed news reports associated with each case to determine the most likely reason the death was excluded from FARS’ pursuit-involved death data. 
+To calculate the minimum undercount of pursuit-related fatalities by NHTSA, we produced a list of deaths from 2017 through 2021 that were included in the data from research groups and our reporting but missing from FARS' count of pursuit-involved fatalities. As of late February, when this project was published, FARS data for 2022 was not publicly available. We manually reviewed news reports associated with each case to determine the most likely reason the death was excluded from FARS’ pursuit-involved death data. 
 
 To understand why police initiated pursuits that ended with fatalities and who died, we relied on the subset of our pursuit fatalities data — roughly two-thirds of the total — that included additional details about the causes and circumstances of each chase and the people involved, gathered from Mapping Police Violence, Fatal Encounters and Incarcernation, plus news reports and public records.
 
@@ -71,6 +71,6 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 <h3> Acknowledgments </h3>
 
-This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the creator of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
+This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
 
-We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA's FARS analyst team, Alexis Piquero, and others.
+We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
