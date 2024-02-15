@@ -1,6 +1,6 @@
 # Fatal police pursuits database
 
-In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** an investigation into police car chases across the U.S. Central to the investigation was a dataset reporters built of people killed in pursuits from 2017 through 2022.
+In late February 2024, the San Francisco Chronicle published **Fast and Fatal,** an investigation into police car chases across the nation. Central to the investigation was a dataset reporters built of people killed in pursuits from 2017 through 2022.
 
 This repository houses our public-facing dataset, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to download and explore.
 
@@ -10,28 +10,28 @@ The fields have the following definitions:
 
 | Column name  | Data type | Description |
 | ------------- | ------------- | ------------ |
-| `unique_id`  | integer  | unique number for each person in data.             |
-| `data_source`  | single-select. options: `nhtsa`, `airtable`, `nhtsa_airtable`, `nhtsa_airtable_fuzzy`    | source of person and fatality information. airtable refers to our detailed dataset sourced from news reports, public records and datasets compiled by other research organizations. nhtsa refers to NHTSA's Fatality Analysis Reporting System, specifically if the death is reported as stemming from a "police pursuit-involved" fatal crash.            |
-| `year_joined`  | integer  | the year the pursuit occurred.             |
-| `date_joined`  | date  | the date the pursuit occurred; if pursuit takes place over multiple days, date of crash or end of pursuit.            |
-| `number_dead_joined`  | integer  | number of people killed in the pursuit.             |
-| `age_joined`  | float  | age of person killed. blank field indicates age is unknown.            |
-| `gender_joined`  | single select. options: `male`, `female`, `nonbinary`, `unknown`  |  gender of person killed.             |
-| `race_joined`  | multiple select. options: `black`, `white`, `latino`, `asian`, `other`, `unknown`.  | perceived race and/or ethnicity of the person killed.           |
-| `racesource_combined`  | multiple select. options: `news reports`, `nhtsa`, `photo`, `original data`,  `other`  |source of perceived race and ethnicity information.             |
-| `county_joined`  | string  | county where fatality or fatal crash occurred.             |
-| `state_joined`  | single select. options: 50 states plus D.C.  | state where fatality or fatal crash occurred.             |
-| `lat_joined`  | float  | approximate latitude of fatality or fatal crash.             |
-| `long_joined`  | float  | approximate longitude of fatality or fatal crash.             |
-| `at_name`  | string  | name of person killed.             |
-| `at_initial_reason`  | single-select. options: `traffic stop`, `suspected nonviolent`, `suspected violent`, `domestic incident`, `minor/no crime`, `other`, `unknown`  | the alleged incident that touched off officers' pursuit. even if a different crime is later confirmed (such as stolen vehicle) or it's confirmed that no crime has actually occurred, this column specifies the incident that touched off the chase according to news reports and other sources.             |
-| `at_person_role`  | single select. options: `driver`, `passenger`, `bystander`, `officer`, `unclear`, `other`  | the role of the person killed as described in news reports and other records. Driver refers to the driver of the car being pursued; passenger refers to a passenger in the car being pursued. Bystander refers to a person (on foot or in another car) that was killed but not being pursued.           |
-| `at_main_agency_responsible`  | string  | the main agency responsible for the pursuit if in airtable, as described in news reports. if multiple agencies gave chase, defaults to the agency chasing closest to the fatality or fatal crash.             |
-| `at_news_urls`  | url(s) | one or more links to a relevant story about the pursuit.             |
-| `at_city`  | string  | city of crash if included in our detailed dataset.             |
-| `at_zip`  | string  | ZIP code where fatality or fatal crash occurred if included in our detailed dataset. note: ZIP code is in a string format to avoid the deletion of leading zeroes.              |
-| `centroid_geo`  | binary  |  if 1, indicates the coordinates of this crash are a) the centroid of the zip code where it occurred and not exact coordinates. If 0, indicates coordinates of this crash were entered by researchers and should be accurate to approximate location of crash.              |
-| `in_fars_pursuit`  | binary  | if 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit data.             |
+| `unique_id`  | integer  | A unique number for each person in the data.             |
+| `data_source`  | single select. options: `nhtsa`, `sfchronicle`, `nhtsa_sfchronicle`    | The source of person and fatality information. `sfchronicle` refers to our detailed dataset sourced from news reports, public records and datasets compiled by other research organizations. `nhtsa` refers to NHTSA's Fatality Analysis Reporting System, specifically if the death is reported as stemming from a "police pursuit-involved" fatal crash. `nhtsa_sfchronicle` means the death was included in both our detailed dataset and NHTSA's FARS pursuit fatality data.            |
+| `year`  | integer  | The year the pursuit occurred.             |
+| `date`  | date  | The date the pursuit occurred. If the pursuit takes place over multiple days, this refers to the date of the crash or end of the pursuit.            |
+| `number_killed`  | integer  | Number of people confirmed killed (excluding any person fatally shot) as a result of the pursuit.             |
+| `age`  | float  | Age of the person killed. A blank field indicates age is unknown.            |
+| `gender`  | single select. options: `male`, `female`, `nonbinary`, `unknown`  |  The gender of the person killed.             |
+| `race`  | multiple select. options: `black`, `white`, `latino`, `asian`, `other`, `unknown`  | The perceived race and/or ethnicity of the person killed. Race has been included when reporters were able to identify a person's likely race based on photos, news reports and public records, and/or if the person's race and ethnicity was included in NHTSA's FARS data.         |
+| `race_source`  | multiple select. options: `news reports`, `nhtsa`, `photo`, `original data`,  `other`  | The source of the perceived race and ethnicity information.             |
+| `county`  | string  | The county where the fatality or fatal crash occurred.             |
+| `state`  | single select. options: 50 states plus D.C.  | The state where the fatality or fatal crash occurred.             |
+| `lat`  | float  | The approximate latitude of the fatality or fatal crash.             |
+| `long`  | float  | The approximate longitude of the fatality or fatal crash.             |
+| `name`  | string  | The name of the person killed.             |
+| `initial_reason`  | single select. options: `traffic stop`, `suspected nonviolent`, `suspected violent`, `domestic incident`, `minor/no crime`, `other`, `unknown`  | The alleged incident that touched off officers' pursuit. Even if a different crime is later confirmed (such as stolen vehicle) or it's confirmed that no crime has actually occurred, this column specifies the incident that touched off the chase according to news reports and other sources.             |
+| `person_role`  | single select. options: `driver`, `passenger`, `bystander`, `officer`, `unclear`, `other`  | The role of the person killed as described in news reports and other records. Driver refers to the driver of the car being pursued; passenger refers to a passenger in the car being pursued. Bystander refers to a person (on foot or in another car) that was killed but not being pursued.           |
+| `main_agency`  | string  | The main agency engaged for the pursuit if included in our detailed dataset, as described in news reports. If multiple agencies gave chase, this value defaults to the agency chasing closest to the fatality or fatal crash.             |
+| `news_urls`  | url(s) | One or more links to a relevant story about the pursuit.             |
+| `city`  | string  | The city where the fatality or fatal crash occurred, if included in our detailed dataset.             |
+| `zip`  | string  | The ZIP code where the fatality or fatal crash occurred if included in our detailed dataset. Note: ZIP code was stored in a string format to avoid the deletion of leading zeroes.              |
+| `centroid_geo`  | binary `0`, `1`  |  If 1, indicates the coordinates of this crash are a) the centroid of the ZIP code where it occurred and not exact coordinates. If 0, indicates coordinates of this crash were entered by researchers and should be accurate to the approximate location of crash.              |
+| `in_fars_pursuit`  | binary `0`, `1` | If 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit-involved fatal crash data.             |
 
 
 <h3> Methodology </h3>
@@ -62,7 +62,7 @@ Within this subset, we categorized people killed in pursuits by their role (driv
 
 Limitations:
 <li> Data for 2022 is less comprehensive than prior years because NHTSA had not released its 2022 FARS file by February 2024, and Fatal Encounters researchers stopped collecting data after 2021. To mitigate this issue, we gathered data from the online database Incarcernation for 2022.
-<li> FARS collects data similar to our “person role” variable, specifying whether the person killed was in the fleeing vehicle and whether they were a driver, passenger or pedestrian. However, when we compared a subset of their categorizations to ours, we found enough discrepancies that we chose to exclude the FARS data and rely solely on what we could verify through news reports and other public records.
+<li> FARS collects data similar to our “person role” variable, specifying whether the person killed was in the fleeing vehicle and whether they were a driver, passenger or pedestrian. However, when we compared a subset of their categorizations to ours, we found enough discrepancies that we chose to exclude the FARS data and rely on what we could verify through news reports and other public records.
 <li> For the race column, we relied heavily on FARS categorizations as well as categorizations made by Mapping Police Violence and Fatal Encounters. We collapsed some racial categories with smaller populations into an “other” category because their numbers were too few to reach reliable conclusions. Additionally, about 11% of the people in our data are categorized as having an “unknown” race. In entering or confirming the race or ethnicity of a person from non-FARS sources, we gauged the person’s “perceived race” based on a combination of the person’s name, photograph(s) and other cues from their obituary or social media profiles. Perceived race is used in police agency datasets, including traffic stop data collected by <a href="https://oag.ca.gov/ab953/board/reports">the California Department of Justice</a> as part of its Racial Identity and Profiling Act.
 <li> Our gender variable largely consists of a simple binary — male or female — and includes very little information on people who identify as nonbinary or trans, largely because it was unavailable for all but one case. 
 <li> Many news stories did not include the initial reason officers said they initiated a traffic stop or pursuit. Therefore, among our data subset of over 2,000 people replete with additional details about the pursuits associated with their deaths, 207 were killed during chases that police initiated for reasons we were unable to determine.
@@ -71,6 +71,6 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 <h3> Acknowledgments </h3>
 
-This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated. 
+This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
 
-We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
+Finally, we wanted to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be vastly understated.
