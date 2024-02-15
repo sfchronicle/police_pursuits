@@ -31,7 +31,7 @@ The fields have the following definitions:
 | `at_city`  | string  | city of crash if included in our detailed dataset.             |
 | `at_zip`  | string  | ZIP code where fatality or fatal crash occurred if included in our detailed dataset. note: ZIP code is in a string format to avoid the deletion of leading zeroes.              |
 | `centroid_geo`  | binary  |  if 1, indicates the coordinates of this crash are a) the centroid of the zip code where it occurred and not exact coordinates. If 0, indicates coordinates of this crash were entered by researchers and should be accurate to approximate location of crash.              |
-| `in_nhtsa`  | binary  | if 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit data.             |
+| `in_fars_pursuit`  | binary  | if 1, indicates the death is included in NHTSA's Fatality Analysis Reporting System as stemming from a "police pursuit-involved" fatal crash. If 0, indicates reporters could not find this death in FARS pursuit data.             |
 
 
 <h3> Methodology </h3>
