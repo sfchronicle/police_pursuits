@@ -1,4 +1,4 @@
-unique_id,data_source,year,date,number_killed,age,gender,race,race_source,county,state,lat,long,name,initial_reason,person_role,main_agency_responsible,news_urls,city,zip,centroid_geo,in_fars_pursuit
+unique_id,data_source,year,date,number_killed,age,gender,race,race_source,county,state,lat,long,name,initial_reason,person_role,main_agency,news_urls,city,zip,centroid_geo,in_fars_pursuit
 1187,nhtsa,2019,3/24/19,4,,male,"white,latino",nhtsa,duval,TX,27.429425,-98.38783889,,,,,,,,0,1
 971,nhtsa,2018,11/2/18,1,,unknown,"white,latino",nhtsa,cochise,AZ,31.81271944,-109.72845,,,,,,,,0,1
 2297,nhtsa,2020,12/20/20,1,,male,white,nhtsa,pulaski,VA,37.077125,-80.77041667,,,,,,,,0,1
