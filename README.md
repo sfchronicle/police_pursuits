@@ -20,7 +20,7 @@ The fields have the following definitions:
 | `race`  | multiple select. options: `black`, `white`, `latino`, `asian`, `other`, `unknown`  | The perceived race and/or ethnicity of the person killed. Race has been included when reporters were able to identify a person's likely race based on photos, news reports and public records, and/or if the person's race and ethnicity was included in NHTSA's FARS data.         |
 | `race_source`  | multiple select. options: `news reports`, `nhtsa`, `photo`, `original data`,  `other`  | The source of the perceived race and ethnicity information.             |
 | `county`  | string  | The county where the fatality or fatal crash occurred.             |
-| `state`  | single select. options: 50 states plus D.C.  | The state where the fatality or fatal crash occurred.             |
+| `state`  | single select. options: 50 states plus D.C.  | The two-letter abbreviation for the state where the fatality or fatal crash occurred.             |
 | `lat`  | float  | The approximate latitude of the fatality or fatal crash.             |
 | `long`  | float  | The approximate longitude of the fatality or fatal crash.             |
 | `name`  | string  | The name of the person killed.             |
