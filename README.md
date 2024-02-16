@@ -71,6 +71,6 @@ We may have overlooked some errors in individual rows during our review. If you 
 
 <h3> Acknowledgments </h3>
 
-This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Sylvia Germek, Abdul Nasser Rad and the Mapping Police Violence team, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
+This dataset would not have been possible without the work of many other researchers, most notably D. Brian Burghart, the founder of Fatal Encounters, and FE's team of researchers and volunteers. We would also like to thank, in no particular order:  Geoffrey Alpert, Thomas Gleason, John P. Gross, Silvia Germek, Abdul Nasser Rad and the Mapping Police Violence team, Albert L. Liebno, Jr., Lisa Pickoff-White, Lisa Fernandez, NHTSA officials, Alexis Piquero, and others.
 
 Finally, we wanted to thank the thousands of journalists who covered the fatal pursuits included in our data. Without their stories, hundreds of chase-related deaths would have remained hidden and the true toll of police pursuits would still be significantly understated.
