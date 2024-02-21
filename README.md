@@ -36,7 +36,7 @@ The fields have the following definitions:
 
 <h3> Methodology </h3>
 
-To build the Chronicle’s national dataset of at least 3,335 people killed in police vehicle pursuits from 2017 through 2022, we used information from three primary sources: the federal government, private research organizations and our reporting.
+To build the Chronicle’s national dataset of at least 3,336 people killed in police vehicle pursuits from 2017 through 2022, we used information from three primary sources: the federal government, private research organizations and our reporting.
 
 While no government agency counts every police pursuit death, the National Highway Traffic Safety Administration (NHTSA) comes closest. We used data published by NHTSA via its Fatality Analysis Reporting system (FARS) to produce a list of people killed in police pursuits recorded by the federal agency. Specifically, we drew from the <a href="https://www.google.com/url?q=https://www.nhtsa.gov/file-downloads?p%3Dnhtsa/downloads/FARS/&sa=D&source=docs&ust=1707950128293481&usg=AOvVaw3yGTlZcoPLLxf2aajfmSu3">FARS global </a> person, vehicle and accident files, as well as its auxiliary accident file.
 
