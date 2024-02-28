@@ -1,6 +1,6 @@
 # Fatal police pursuits database
 
-In late February 2024, the San Francisco Chronicle published <a href="https://www.sfchronicle.com/projects/test-proj/police-chases/">Fast and Fatal</a>, an investigation into police car chases across the U.S. The investigation centered on a dataset reporters built of people killed in pursuits from 2017 through 2022.
+In late February 2024, the San Francisco Chronicle published <a href="https://www.sfchronicle.com/projects/2024/police-chases/">Fast and Fatal</a>, an investigation into police car chases across the U.S. The investigation centered on a dataset reporters built of people killed in pursuits from 2017 through 2022.
 
 This repository houses our public-facing dataset, which we invite researchers, other journalists and anyone else interested in fatal police pursuits to download and explore.
 
